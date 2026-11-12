@@ -1,0 +1,14 @@
+{
+  "name": "StudySpace — учиться проще",
+  "short_name": "StudySpace",
+  "description": "Бесплатное пространство для школьной учёбы",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f7fc",
+  "theme_color": "#f4efff",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
