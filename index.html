@@ -1,65 +1,311 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#927bc9"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><title>StudySpace</title>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#b9a2e8">
+<title>StudySpace</title>
 <style>
-:root{--p:#927bc9;--pale:#eee8fb;--mint:#dff4ef;--bg:#f8f7fb;--ink:#302b3c;--muted:#817b8d}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px -apple-system,BlinkMacSystemFont,sans-serif}.app{max-width:720px;margin:auto;padding-bottom:85px}header{padding:22px 18px;background:linear-gradient(135deg,#eee8fb,#e2f5f0);border-radius:0 0 25px 25px}.brand{font-size:25px;font-weight:800}.brand span{color:var(--p)}.muted{color:var(--muted);font-size:12px}.hello{font-size:22px;font-weight:750;margin-top:22px}.search,.card,.item{background:white;border:1px solid #ece8f2;border-radius:17px;padding:14px;margin-top:12px}.search input,input,textarea,select{width:100%;padding:12px;border:1px solid #ece8f2;border-radius:12px;background:white;font:inherit}.search input{border:0;padding:0}.page{display:none;padding:18px}.page.active{display:block}h2{font-size:19px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.tile{padding:15px;background:white;border:1px solid #ece8f2;border-radius:17px;min-height:110px;text-align:left}.ico{font-size:22px;color:var(--p)}button{cursor:pointer}.btn{background:var(--p);color:white;border:0;border-radius:12px;padding:12px;font-weight:700;width:100%;margin-top:9px}.secondary{background:var(--pale);color:#67538f}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(720px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#fffe;border-top:1px solid #ece8f2;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}.nav button{background:none;border:0;color:#817b8d;font-size:11px}.nav button b{display:block;font-size:19px}.nav button.active{color:var(--p);font-weight:bold}.item{line-height:1.5}.chat{height:230px;overflow:auto;background:white;border-radius:14px;padding:12px}.msg{background:var(--pale);padding:10px;border-radius:12px;margin:7px 0;font-size:13px}.msg.user{background:var(--mint);text-align:right}.row{display:flex;gap:8px}.row>*{flex:1}
-input[type=file]{font-size:13px;padding:9px;background:#fff;border:1px solid #ece8f2;border-radius:12px;width:100%;margin-top:8px}</style></head><body><div class="app"><header><div class="brand">Study<span>Space</span></div><div class="muted">Твоя школа в одном приложении</div><div class="hello">Учиться проще, когда всё рядом.</div><div class="muted">Теория, учебники, ГДЗ и ИИ-помощник.</div><div class="search">⌕ <input placeholder="Найти тему или предмет..." oninput="quickSearch(this.value)"></div></header>
-<section id="home" class="page active"><h2>Твоя учебная панель</h2><div class="grid">
-<button class="tile" onclick="show('ai')"><div class="ico">✦</div><b>ИИ-репетитор</b><div class="muted">Объяснения и вопросы</div></button>
-<button class="tile" onclick="show('books')"><div class="ico">▤</div><b>Мои учебники</b><div class="muted">Ссылки и материалы</div></button>
-<button class="tile" onclick="show('theory')"><div class="ico">▧</div><b>Вся теория</b><div class="muted">1–11 классы</div></button>
-<button class="tile" onclick="show('gdz')"><div class="ico">✓</div><b>ГДЗ с разбором</b><div class="muted">Каждый шаг и правило</div></button>
-<button class="tile" onclick="show('cards')"><div class="ico">▣</div><b>Карточки</b><div class="muted">Запоминание</div></button>
-<button class="tile" onclick="show('tests')"><div class="ico">☷</div><b>Тесты</b><div class="muted">Проверка знаний</div></button></div>
-<div class="card"><b>Быстрый старт</b><p class="muted">Выбери класс и предмет</p><select id="quickGrade"></select><select id="quickSubject"></select><button class="btn" onclick="show('theory');loadTheory()">Открыть теорию</button></div><div id="homeBooks"></div></section>
-<section id="ai" class="page"><h2>ИИ-репетитор</h2>
-<div class="card muted">Выбери предмет, задай вопрос или прикрепи фото/PDF. ИИ будет объяснять ход решения, правила и формулы.</div>
-<div class="row"><select id="aiGrade"></select><select id="aiSubject"></select></div>
-<div id="chat" class="chat"><div class="msg">Привет! Я Study AI. Объясню тему по шагам и помогу разобраться, а не просто перепишу ответ.</div></div>
-<textarea id="question" placeholder="Например: объясни фотосинтез или разбери задачу..." rows="3"></textarea>
-<input id="aiFile" type="file" accept="image/*,.pdf,application/pdf">
-<button class="btn" onclick="sendChat()">Отправить</button><div id="aiStatus" class="muted"></div></section>
-<section id="books" class="page"><h2>Мои учебники</h2><div class="card"><input id="bookName" placeholder="Название учебника"><input id="bookUrl" placeholder="Ссылка на учебник (https://...)"><div class="row"><select id="bookGrade"></select><select id="bookSubject"></select></div><button class="btn" onclick="addBook()">Сохранить ссылку</button><p class="muted">Ссылки сохраняются на устройстве. Для чтения содержимого ИИ понадобится доступный PDF/текст и серверная обработка.</p></div><div id="booksList"></div></section>
-<section id="theory" class="page"><h2>Вся теория · 1–11 классы</h2><select id="theoryGrade"></select><select id="theorySubject"></select><button class="btn" onclick="loadTheory()">Показать темы</button><div id="topics"></div></section>
-<section id="gdz" class="page"><h2>ГДЗ с подробными объяснениями</h2><textarea id="task" rows="5" placeholder="Вставь условие задания или напиши номер..."></textarea><div class="row"><select id="gdzGrade"></select><select id="gdzSubject"></select></div><button class="btn" onclick="solvePlan()">Разобрать задание</button><div id="solution" class="card muted">Здесь будет решение: условие, правило, объяснение выбора, шаги, проверка и ответ. Автоматическое решение подключим вместе с ИИ.</div></section>
-<section id="cards" class="page"><h2>Мои карточки</h2><input id="term" placeholder="Термин или вопрос"><textarea id="definition" rows="2" placeholder="Определение или ответ"></textarea><button class="btn" onclick="addCard()">Добавить карточку</button><div id="cardsList"></div></section>
-<section id="tests" class="page"><h2>Тренировочный тест</h2><div class="card"><b>Какая структура клетки хранит основную часть наследственной информации у эукариот?</b><div id="options"></div><div id="result" class="muted"></div></div></section>
-<section id="profile" class="page"><h2>Профиль</h2><div class="card"><p>StudySpace — учебная платформа для iPhone и Android.</p><p class="muted">В этой версии данные сохраняются локально в браузере. Синхронизация, аккаунты и ИИ требуют серверной части.</p></div></section>
-<nav class="nav"><button class="active" onclick="show('home')"><b>⌂</b>Главная</button><button onclick="show('theory')"><b>▧</b>Теория</button><button onclick="show('ai')"><b>✦</b>ИИ</button><button onclick="show('gdz')"><b>✓</b>ГДЗ</button><button onclick="show('profile')"><b>◉</b>Профиль</button></nav></div>
-<script>
-const subjects=["Русский язык","Литература","Английский язык","Немецкий язык","Французский язык","Математика","Алгебра","Геометрия","Вероятность и статистика","Информатика","История России","Всеобщая история","Обществознание","Биология","Химия","Физика","География","Астрономия","Экономика","Право","Физическая культура","ОБЖ","Технология","Музыка","ИЗО","МХК"];
-const grades=Array.from({length:11},(_,i)=>(i+1)+" класс");
-function fill(id,arr,placeholder){document.getElementById(id).innerHTML=(placeholder?`<option value="">${placeholder}</option>`:"")+arr.map(x=>`<option>${x}</option>`).join("")}
-["quickGrade","bookGrade","theoryGrade","gdzGrade","aiGrade"].forEach(x=>fill(x,grades,"Выбери класс"));
-["quickSubject","bookSubject","theorySubject","gdzSubject","aiSubject"].forEach(x=>fill(x,subjects,"Выбери предмет"));
-let books=JSON.parse(localStorage.getItem("ssbooks")||"[]"),cards=JSON.parse(localStorage.getItem("sscards")||"[]");
-function show(id){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===id));document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));let b=[...document.querySelectorAll(".nav button")].find(x=>x.getAttribute("onclick").includes(id));if(b)b.classList.add("active");window.scrollTo(0,0)}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function addBook(){let n=bookName.value.trim(),u=bookUrl.value.trim();if(!n||!/^https?:\/\//i.test(u)){alert("Добавь название и корректную ссылку.");return}books.push({n,u,g:bookGrade.value,s:bookSubject.value});localStorage.setItem("ssbooks",JSON.stringify(books));bookName.value=bookUrl.value="";renderBooks()}
-function renderBooks(){booksList.innerHTML=books.length?books.map((b,i)=>`<div class="item"><b>${esc(b.n)}</b><div class="muted">${esc(b.g)} · ${esc(b.s)}</div><a href="${esc(b.u)}" target="_blank" rel="noopener">Открыть учебник ↗</a> <button onclick="delBook(${i})">Удалить</button></div>`).join(""):"<p class='muted'>Пока учебников нет.</p>";homeBooks.innerHTML=books.length?"<h3>Недавние учебники</h3>"+books.slice(-2).map(b=>`<div class='item'>${esc(b.n)}</div>`).join(""):""}
-function delBook(i){books.splice(i,1);localStorage.setItem("ssbooks",JSON.stringify(books));renderBooks()}
-function loadTheory(){let g=theoryGrade.value||quickGrade.value,s=theorySubject.value||quickSubject.value;if(!g||!s){topics.innerHTML="<p class='muted'>Выбери класс и предмет.</p>";return}topics.innerHTML=`<div class="item"><b>${esc(g)} · ${esc(s)}</b><p>Каталог тем будет наполняться по школьной программе. Здесь будут краткая теория, определения, схемы, примеры и задания.</p></div>`}
-function solvePlan(){if(!task.value.trim()){alert("Сначала вставь условие задания.");return}solution.innerHTML="<b>Структура разбора</b><p>1. Выделяем, что известно и что нужно найти.</p><p>2. Определяем подходящее правило или формулу и объясняем почему.</p><p>3. Выполняем решение по шагам с пояснением каждого действия.</p><p>4. Проверяем результат и записываем ответ.</p><p>Для содержательного решения по твоему условию подключим ИИ-сервис.</p>"}
-async function sendChat(){
- const q=question.value.trim(), file=document.getElementById("aiFile")?.files?.[0];
- if(!q&&!file)return;
- const chatEl=document.getElementById("chat"), status=document.getElementById("aiStatus");
- chatEl.innerHTML+=`<div class="msg user">${esc(q||"Разбери прикреплённый файл")}${file?" · "+esc(file.name):""}</div>`;
- question.value=""; status.textContent="Study AI готовит объяснение…";
- const fd=new FormData(); fd.append("message",q); fd.append("grade",document.getElementById("aiGrade").value||""); fd.append("subject",document.getElementById("aiSubject").value||"");
- if(file)fd.append("file",file); 
- try{
-   const r=await fetch("/api/chat",{method:"POST",body:fd});
-   const data=await r.json();
-   if(!r.ok)throw new Error(data.error||"Не удалось получить ответ");
-   chatEl.innerHTML+=`<div class="msg">${esc(data.answer).replace(/\n/g,"<br>")}</div>`;
- }catch(e){
-   chatEl.innerHTML+=`<div class="msg">ИИ пока не подключён или сервер недоступен. ${esc(e.message)}<br><span class="muted">Проверь настройки сервера и OPENAI_API_KEY.</span></div>`;
- }
- status.textContent=""; chatEl.scrollTop=chatEl.scrollHeight;
+:root {
+  --purple:#b9a2e8;
+  --light:#eee8fa;
+  --turquoise:#78d6cc;
+  --mint:#e1f6f1;
+  --text:#292638;
 }
-function addCard(){let t=term.value.trim(),d=definition.value.trim();if(!t||!d)return;cards.push({t,d});localStorage.setItem("sscards",JSON.stringify(cards));term.value=definition.value="";renderCards()}
-function renderCards(){cardsList.innerHTML=cards.map((c,i)=>`<details class="item"><summary><b>${esc(c.t)}</b></summary><p>${esc(c.d)}</p><button onclick="cards.splice(${i},1);localStorage.setItem('sscards',JSON.stringify(cards));renderCards()">Удалить</button></details>`).join("")||"<p class='muted'>Карточек пока нет.</p>"}
-function quickSearch(q){if(q.length>1){show("theory");let s=subjects.find(x=>x.toLowerCase().includes(q.toLowerCase()));if(s)theorySubject.value=s}}
-function answer(i){result.textContent=i===0?"Верно! У эукариот основная часть ДНК находится в ядре.":"Не совсем. Подумай, где находятся хромосомы."}
-options.innerHTML=["Ядро","Рибосома","Клеточная стенка","Аппарат Гольджи"].map((x,i)=>`<button class="item" style="display:block;width:100%;text-align:left" onclick="answer(${i})">${x}</button>`).join("");
-renderBooks();renderCards();if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
-</script></body></html>
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family:Arial,sans-serif;
+  background:#f8f7fc;
+  color:var(--text);
+}
+header {
+  background:white;
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+}
+.logo { font-size:24px; font-weight:bold; color:#8065b7; }
+.logo span { color:#48bdb1; }
+nav { display:flex; flex-wrap:wrap; gap:7px; }
+nav button {
+  border:0;
+  background:transparent;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+}
+nav button.active { background:var(--light); }
+main { max-width:1050px; margin:auto; padding:25px 16px; }
+.hero {
+  background:linear-gradient(120deg,var(--light),var(--mint));
+  padding:35px 25px;
+  border-radius:22px;
+}
+h1 { margin-bottom:15px; }
+h2 { margin:25px 0 15px; }
+p { line-height:1.6; }
+.page { display:none; }
+.page.visible { display:block; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:13px;
+  margin-top:15px;
+}
+.card {
+  background:white;
+  border:1px solid #eeeaf5;
+  border-radius:17px;
+  padding:19px;
+  text-align:left;
+}
+button.card { cursor:pointer; color:var(--text); }
+.card strong { display:block; margin-bottom:8px; }
+.card small { color:#777486; }
+.class-list {
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:9px;
+}
+.class-button {
+  padding:14px;
+  border:1px solid #e6def4;
+  background:white;
+  border-radius:12px;
+  cursor:pointer;
+}
+.class-button.selected { background:var(--purple); color:white; }
+.search {
+  width:100%;
+  padding:14px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  font-size:16px;
+  margin-top:15px;
+}
+.primary {
+  background:#987bc9;
+  color:white;
+  border:0;
+  border-radius:12px;
+  padding:13px 20px;
+  margin-top:18px;
+  cursor:pointer;
+}
+.back {
+  background:var(--light);
+  border:0;
+  border-radius:10px;
+  padding:11px 15px;
+  margin-bottom:20px;
+}
+.notice {
+  background:var(--mint);
+  padding:15px;
+  border-radius:13px;
+  margin-top:15px;
+}
+footer { text-align:center; padding:25px; color:#777486; }
+@media(max-width:600px) {
+  header { align-items:flex-start; flex-direction:column; }
+  .class-list { grid-template-columns:repeat(4,1fr); }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Study<span>Space</span></div>
+  <nav>
+    <button class="active" onclick="showPage('home',this)">Главная</button>
+    <button onclick="showPage('subjects',this)">Предметы</button>
+    <button onclick="showPage('exams',this)">ОГЭ и ЕГЭ</button>
+    <button onclick="showPage('projects',this)">Проекты</button>
+    <button onclick="showPage('profile',this)">Профиль</button>
+  </nav>
+</header>
+<main>
+<section id="home" class="page visible">
+  <div class="hero">
+    <h1>Учиться может каждый!</h1>
+    <p>StudySpace — бесплатная образовательная платформа для школьников с 1-го по 11-й класс.</p>
+    <button class="primary" onclick="showPage('subjects')">Начать обучение</button>
+  </div>
+  <h2>Выбери свой класс</h2>
+  <div class="class-list" id="classList"></div>
+  <p class="notice" id="classMessage">Выбери класс для начала обучения.</p>
+  <h2>Возможности StudySpace</h2>
+  <div class="grid">
+    <button class="card" onclick="showPage('subjects')"><strong>Учебники и теория</strong><small>Материалы для всех классов</small></button>
+    <button class="card" onclick="showPage('exams')"><strong>ОГЭ и ЕГЭ</strong><small>Подготовка к экзаменам</small></button>
+    <button class="card" onclick="showPage('projects')"><strong>Проекты</strong><small>Создание школьных работ</small></button>
+    <button class="card" onclick="showPage('materials')"><strong>Шпаргалки</strong><small>Краткое повторение тем</small></button>
+  </div>
+</section>
+<section id="subjects" class="page">
+  <button class="back" onclick="showPage('home')">← Назад</button>
+  <h1>Учебные предметы</h1>
+  <input class="search" id="subjectSearch" placeholder="Поиск предмета..." oninput="filterSubjects()">
+  <div class="grid" id="subjectGrid"></div>
+</section>
+<section id="subjectDetail" class="page">
+  <button class="back" onclick="showPage('subjects')">← К предметам</button>
+  <h1 id="subjectTitle">Предмет</h1>
+  <div class="grid">
+    <div class="card"><strong>Теория</strong><small>Правила и объяснения</small></div>
+    <div class="card"><strong>Конспекты</strong><small>Краткие записи</small></div>
+    <div class="card"><strong>Тесты</strong><small>Проверка знаний</small></div>
+    <div class="card"><strong>Видеоуроки</strong><small>Обучающие материалы</small></div>
+    <div class="card"><strong>Учебники</strong><small>Каталог литературы</small></div>
+    <div class="card"><strong>Карточки</strong><small>Повторение понятий</small></div>
+  </div>
+  <p class="notice">Раздел находится в разработке.</p>
+</section>
+<section id="exams" class="page">
+  <button class="back" onclick="showPage('home')">← Назад</button>
+  <h1>Подготовка к ОГЭ и ЕГЭ</h1>
+  <div class="grid">
+    <div class="card"><strong>ОГЭ</strong><small>Подготовка для 9 класса</small></div>
+    <div class="card"><strong>ЕГЭ</strong><small>Подготовка для 10–11 классов</small></div>
+    <div class="card"><strong>Пробники</strong><small>Тренировочные варианты</small></div>
+    <div class="card"><strong>Справочники</strong><small>Формулы и таблицы</small></div>
+  </div>
+  <p class="notice">Материалы будут сверяться с официальными документами ФИПИ.</p>
+</section>
+<section id="projects" class="page">
+  <button class="back" onclick="showPage('home')">← Назад</button>
+  <h1>Школьные проекты</h1>
+  <p class="notice">Здесь появится конструктор проектов, презентаций, анкет и исследований.</p>
+</section>
+<section id="materials" class="page">
+  <button class="back" onclick="showPage('home')">← Назад</button>
+  <h1>Шпаргалки и справочники</h1>
+  <div class="grid">
+    <div class="card"><strong>Химия</strong><small>Таблица Менделеева и формулы</small></div>
+    <div class="card"><strong>Биология</strong><small>Клетка и генетика</small></div>
+    <div class="card"><strong>Математика</strong><small>Формулы и геометрия</small></div>
+    <div class="card"><strong>Физика</strong><small>Законы и величины</small></div>
+    <div class="card"><strong>Русский язык</strong><small>Орфография и пунктуация</small></div>
+    <div class="card"><strong>История</strong><small>Даты и события</small></div>
+  </div>
+</section>
+<section id="profile" class="page">
+  <button class="back" onclick="showPage('home')">← Назад</button>
+  <h1>Мой профиль</h1>
+  <p class="notice">Здесь будут храниться предметы, прогресс, сложные темы и расписание.</p>
+</section>
+</main>
+<footer>StudySpace © 2026 · Бесплатное обучение для каждого</footer>
+<script>
+
+const subjects = [
+  "Русский язык",
+  "Литература",
+  "Математика",
+  "Алгебра",
+  "Геометрия",
+  "Информатика",
+  "Физика",
+  "Химия",
+  "Биология",
+  "История",
+  "Обществознание",
+  "География",
+  "Английский язык",
+  "Немецкий язык",
+  "Французский язык",
+  "Искусство",
+  "Музыка",
+  "Технология",
+  "Физическая культура",
+  "ОБЗР"
+];
+
+function showPage(id, button) {
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("visible");
+  });
+
+  const target = document.getElementById(id);
+  if (target) target.classList.add("visible");
+
+  document.querySelectorAll("nav button").forEach(item => {
+    item.classList.remove("active");
+  });
+
+  if (button) button.classList.add("active");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function createClasses() {
+  const list = document.getElementById("classList");
+
+  for (let i = 1; i <= 11; i++) {
+    const button = document.createElement("button");
+    button.className = "class-button";
+    button.textContent = i;
+    button.onclick = () => selectClass(i, button);
+    list.appendChild(button);
+  }
+}
+
+function selectClass(number, button) {
+  document.querySelectorAll(".class-button").forEach(item => {
+    item.classList.remove("selected");
+  });
+
+  button.classList.add("selected");
+
+  document.getElementById("classMessage").textContent =
+    "Выбран " + number + " класс. Выбери предмет для обучения.";
+
+  showPage("subjects");
+}
+
+function renderSubjects(items) {
+  const grid = document.getElementById("subjectGrid");
+  grid.innerHTML = "";
+
+  items.forEach(subject => {
+    const button = document.createElement("button");
+    button.className = "card";
+
+    const title = document.createElement("strong");
+    title.textContent = subject;
+
+    const description = document.createElement("small");
+    description.textContent = "Открыть материалы предмета";
+
+    button.appendChild(title);
+    button.appendChild(description);
+
+    button.onclick = () => {
+      document.getElementById("subjectTitle").textContent = subject;
+      showPage("subjectDetail");
+    };
+
+    grid.appendChild(button);
+  });
+}
+
+function filterSubjects() {
+  const value = document.getElementById("subjectSearch").value
+    .toLowerCase();
+
+  const filtered = subjects.filter(subject =>
+    subject.toLowerCase().includes(value)
+  );
+
+  renderSubjects(filtered);
+}
+
+createClasses();
+renderSubjects(subjects);
+</script>
+</body>
+</html>
